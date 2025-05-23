@@ -147,6 +147,7 @@ RUN apt-get install -y --no-install-recommends \
   libqrencode-dev \
   libjson-glib-dev
 
+
 # Fetch Ruby source
 RUN curl -fsSL https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%.*}/ruby-${RUBY_VERSION}.tar.gz -o ruby.tar.gz && \
   tar -xzf ruby.tar.gz
@@ -171,11 +172,14 @@ RUN cd gstreamer && \
   ninja -C build install && \
   ldconfig
 
-# Clean up GStreamer source
-RUN rm -rf gstreamer
 
-# Clean up Ruby source and apt lists
-RUN rm -rf ruby-${RUBY_VERSION} ruby.tar.gz /var/lib/apt/lists/*
+ENV PATH=$PATH:/root/.cargo/bin
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN cargo install cargo-c
+RUN git clone --branch 0.13 --depth 1 --recurse-submodules https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git
+RUN cd gst-plugins-rs
+RUN cd gst-plugins-rs && cargo cbuild --prefix=/usr && cargo cinstall --prefix=/usr
+
 
 #######################
 # Final runtime stage #
