@@ -177,9 +177,12 @@ ENV PATH=$PATH:/root/.cargo/bin
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN cargo install cargo-c
 RUN git clone --branch 0.13 --depth 1 --recurse-submodules https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git
-RUN cd gst-plugins-rs
 RUN cd gst-plugins-rs && cargo cbuild --prefix=/usr && cargo cinstall --prefix=/usr
 
+
+RUN rm -rf gstreamer
+RUN rm -rf gst-plugins-rs
+RUN rm -rf ruby-${RUBY_VERSION} ruby.tar.gz /var/lib/apt/lists/*
 
 #######################
 # Final runtime stage #
